@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Minha Loja de Livros - Arthur Martin</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4f8;
+      margin: 0; padding: 0;
+      color: #333;
+    }
+    header {
+      background-color: #2d6cdf;
+      color: white;
+      padding: 1em;
+      text-align: center;
+    }
+    main {
+      max-width: 900px;
+      margin: 2em auto;
+      background: white;
+      border-radius: 8px;
+      padding: 1.5em;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      color: #2d6cdf;
+    }
+    form {
+      margin-bottom: 2em;
+      background: #e7f0fe;
+      padding: 1em;
+      border-radius: 6px;
+    }
+    form input, form textarea {
+      width: 100%;
+      margin-bottom: 1em;
+      padding: 0.5em;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1em;
+      box-sizing: border-box;
+    }
+    form label {
+      font-weight: bold;
+      margin-bottom: 0.3em;
+      display: block;
+    }
+    button {
+      background-color: #2d6cdf;
+      color: white;
+      border: none;
+      padding: 0.7em 1.2em;
+      border-radius: 5px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #1a47a3;
+    }
+    .book-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1em;
+      justify-content: center;
+    }
+    .book {
+      background: #fafafa;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 1em;
+      width: 250px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .book img {
+      max-width: 100%;
+      height: 140px;
+      object-fit: cover;
+      border-radius: 4px;
+      margin-bottom: 0.8em;
+      background: #ddd;
+    }
+    .book h3 {
+      margin: 0 0 0.5em;
+      color: #2d6cdf;
+      font-size: 1.2em;
+    }
+    .book p {
+      flex-grow: 1;
+      font-size: 0.9em;
+      margin-bottom: 0.5em;
+    }
+    .price {
+      font-weight: bold;
+      color: #009900;
+      margin-bottom: 0.5em;
+    }
+    .actions {
+      display: flex;
+      justify-content: space-between;
+    }
+    .actions button {
+      flex: 1;
+      margin-right: 0.5em;
+    }
+    .actions button:last-child {
+      margin-right: 0;
+      background-color: #cc3333;
+    }
+    .actions button:last-child:hover {
+      background-color: #992222;
+    }
+    section.contact {
+      margin-top: 3em;
+      text-align: center;
+      font-size: 0.9em;
+      color: #666;
+    }
+    section.contact a {
+      color: #2d6cdf;
+      font-weight: bold;
+      text-decoration: none;
+    }
+    section.contact a:hover {
+      text-decoration: underline;
+    }
+
+    /* Modal */
+    #modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+    }
+    #modal .modal-content {
+      background: white;
+      padding: 2em;
+      border-radius: 8px;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+    }
+    #modal .modal-content button {
+      margin-top: 1.5em;
+      padding: 0.5em 1.5em;
+      background: #2d6cdf;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    #modal .modal-content button:hover {
+      background: #1a47a3;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Minha Loja de Livros - Arthur Martin</h1>
+</header>
+
+<main>
+  <h2>Adicionar / Editar Livro</h2>
+  <form id="book-form">
+    <input type="hidden" id="book-id" />
+    <label for="title">Título do Livro</label>
+    <input type="text" id="title" placeholder="Digite o título" required />
+    <label for="description">Descrição</label>
+    <textarea id="description" rows="3" placeholder="Digite a descrição" required></textarea>
+    <label for="price">Preço (R$)</label>
+    <input type="number" id="price" placeholder="Ex: 29.90" min="0" step="0.01" required />
+    <label for="image">URL da Imagem</label>
+    <input type="url" id="image" placeholder="Link da capa do livro" required />
+    <button type="submit">Salvar Livro</button>
+  </form>
+
+  <h2>Livros Criados</h2>
+  <div class="book-list" id="book-list"></div>
+
+  <section class="contact">
+    <h2>Contato</h2>
+    <p>Se tiver dúvidas ou problemas, fale comigo:</p>
+    <p>E-mail: <a href="mailto:arthur.martin@escola.pr.gov.br">arthur.martin@escola.pr.gov.br</a></p>
+    <p>Instagram: <a href="https://www.instagram.com/arthur_santos_martin?igsh=bzBsNXQzdnpwMTJr" target="_blank">@arthur_santos_martin</a></p>
+  </section>
+</main>
+
+<!-- Modal de compra -->
+<div id="modal">
+  <div class="modal-content">
+    <h3>Compra do Livro</h3>
+    <p id="modal-book-title"></p>
+    <p id="modal-book-price"></p>
+    <p>Compra simulada. Para venda real, precisa integrar sistema de pagamento.</p>
+    <button onclick="closeModal()">Fechar</button>
+  </div>
+</div>
+
+<script>
+  let books = JSON.parse(localStorage.getItem('books')) || [];
+
+  const form = document.getElementById('book-form');
+  const bookListEl = document.getElementById('book-list');
+  const modal = document.getElementById('modal');
+  const modalBookTitle = document.getElementById('modal-book-title');
+  const modalBookPrice = document.getElementById('modal-book-price');
+  const bookIdInput = document.getElementById('book-id');
+  const titleInput = document.getElementById('title');
+  const descriptionInput = document.getElementById('description');
+  const priceInput = document.getElementById('price');
+  const imageInput = document.getElementById('image');
+
+  function saveBooks() {
+    localStorage.setItem('books', JSON.stringify(books));
+  }
+
+  function renderBooks() {
+    bookListEl.innerHTML = '';
+    if (books.length === 0) {
+      bookListEl.innerHTML = '<p>Nenhum livro criado ainda.</p>';
+      return;
+    }
+    books.forEach(book => {
+      const bookEl = document.createElement('div');
+      bookEl.className = 'book';
+      bookEl.innerHTML = `
+        <img src="${book.image}" alt="${book.title}" />
+        <h3>${book.title}</h3>
+        <p>${book.description}</p>
+        <div class="price">R$ ${parseFloat(book.price).toFixed(2)}</div>
+        <div class="actions">
+          <button onclick="editBook('${book.id}')">Editar</button>
+          <button onclick="deleteBook('${book.id}')">Excluir</button>
+          <button onclick="buyBook('${book.id}')">Comprar</button>
+        </div>
+      `;
+      bookListEl.appendChild(bookEl);
+    });
+  }
+
+  function generateId() {
+    return '_' + Math.random().toString(36).substr(2, 9);
+  }
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const id = bookIdInput.value;
+    const title = titleInput.value.trim();
+    const description = descriptionInput.value.trim();
+    const price = priceInput.value;
+    const image = imageInput.value.trim();
+
+    if (!title || !description || !price || !image) {
+      alert('Preencha todos os campos!');
+      return;
+    }
+
+    if (id) {
+      // Editar livro existente
+      const index = books.findIndex(b => b.id === id);
+      if (index !== -1) {
+        books[index] = { id, title, description, price, image };
+      }
+    } else {
+      // Adicionar novo livro
+      const newBook = { id: generateId(), title, description, price, image };
+      books.push(newBook);
+    }
+
+    saveBooks();
+    renderBooks();
+    form.reset();
+    bookIdInput.value = '';
+  });
+
+  function editBook(id) {
+    const book = books.find(b => b.id === id);
+    if (!book) return;
+    bookIdInput.value = book.id;
+    titleInput.value = book.title;
+    descriptionInput.value = book.description;
+    priceInput.value = book.price;
+    imageInput.value = book.image;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function deleteBook(id) {
+    if (!confirm('Deseja realmente excluir este livro?')) return;
+    books = books.filter(b => b.id !== id);
+    saveBooks();
+    renderBooks();
+  }
+
+  function buyBook(id) {
+    const book = books.find(b => b.id === id);
+    if (!book) return;
+    modalBookTitle.textContent = book.title;
+    modalBookPrice.textContent = `Preço: R$ ${parseFloat(book.price).toFixed(2)}`;
+    modal.style.display = 'flex';
+  }
+
+  function closeModal() {
+    modal.style.display = 'none';
+  }
+
+  // Fecha modal clicando fora da caixa
+  modal.addEventListener('click', e => {
+    if (e.target === modal) closeModal();
+  });
+
+  renderBooks();
+</script>
+
+</body>
+</html>
